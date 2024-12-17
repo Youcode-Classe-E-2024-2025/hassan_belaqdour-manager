@@ -81,9 +81,10 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
     width: 512px;
     height: 420px;
-    overflow: hidden;
+    border: 1px solid #fff;
     z-index: 2;
 }
 .login-container{
@@ -106,6 +107,8 @@ body{
     color: #fff;
     font-size: small;
     padding: 10px 0;
+    display: flex;
+    justify-content: center;
 }
 .top span a{
     font-weight: 500;
@@ -173,7 +176,7 @@ header{
     display: flex;
     gap: 5px;
 }
-.two label{
+.two label a{
     text-decoration: none;
     color: #fff;
 }
