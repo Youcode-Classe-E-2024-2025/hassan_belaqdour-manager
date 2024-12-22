@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// Connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "securite";
 
-// Créer la connexion
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -17,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Vérification de l'email et du mot de passe
     $sql = "SELECT * FROM users WHERE email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);

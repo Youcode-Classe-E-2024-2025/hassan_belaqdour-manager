@@ -1,35 +1,30 @@
 <?php
-// Connexion à la base de données
 $conn = new mysqli("localhost", "root", "", "securite");
 if ($conn->connect_error) {
     die("Erreur de connexion : " . $conn->connect_error);
 }
-
-// Récupérer les utilisateurs en attente de validation
 $queryUsers = "SELECT id, email, status_id FROM users";
 $resultUsers = $conn->query($queryUsers);
 
-// Vérification des résultats pour les utilisateurs
 if (!$resultUsers) {
     die("Erreur SQL : " . $conn->error);
 }
 
-// Vérifier si des utilisateurs sont trouvés
 if ($resultUsers->num_rows == 0) {
     echo "Aucun utilisateur en attente trouvé.<br>";
 }
 
-// Préparer les données utilisateur et leurs détails
 $usersData = [];
 while ($user = $resultUsers->fetch_assoc()) {
 
-    // Récupérer les détails pour chaque utilisateur
+
+
+
     $userId = $user['id'];
     $queryDetails = "SELECT first_name, last_name, phone_number FROM user_details WHERE user_id = $userId";
     $resultDetails = $conn->query($queryDetails);
 
     if ($resultDetails && $userDetails = $resultDetails->fetch_assoc()) {
-        // Ajouter les détails à l'utilisateur
         $user['first_name'] = $userDetails['first_name'];
         $user['last_name'] = $userDetails['last_name'];
         $user['phone_number'] = $userDetails['phone_number'];
@@ -57,16 +52,16 @@ while ($user = $resultUsers->fetch_assoc()) {
 
             <!-- Validation des utilisateurs -->
             <div>
-                <h2 class="text-xl font-bold mb-2">Utilisateurs en attente</h2>
+                <h2 class="text-xl font-bold mb-2">Utilisateurs enregistres</h2>
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr>
                             <th class="border p-2">ID</th>
-                            <th class="border p-2">Prénom</th>
+                            <th class="border p-2">Prenom</th>
                             <th class="border p-2">Nom</th>
                             <th class="border p-2">Email</th>
-                            <th class="border p-2">Numéro de téléphone</th>
-                            <th class="border p-2">Actions</th>
+                            <th class="border p-2">Numero de telephone</th>
+                            <th class="border p-2">Role</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,9 +75,9 @@ while ($user = $resultUsers->fetch_assoc()) {
                                     <td class="border p-2"><?php echo $user['phone_number']; ?></td>
                                     <td class="border p-2">
                                         <a href="accept.php?id=<?php echo $user['id']; ?>"
-                                            class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">Approuver</a>
+                                            class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">UPDATE TO ADMIN</a>
                                         <a href="reject.php?id=<?php echo $user['id']; ?>"
-                                            class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Rejeter</a>
+                                            class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">UPDATE TO USER</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

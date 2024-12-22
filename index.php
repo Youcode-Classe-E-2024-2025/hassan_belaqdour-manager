@@ -1,32 +1,27 @@
 <?php
 session_start();
 
-// Connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "securite";
 
-// Créer la connexion
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Vérification si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Récupérer les données du formulaire
     $appointment_date = $_POST['appointment_date'];
     $description = $_POST['description'];
-    $status_id = 1; // Par défaut, le statut est "en attente"
+    $status_id = 1;
     $user_id = $_SESSION['user_id'];
 
-    // Insérer les données dans la table appointments
     $sql = "INSERT INTO appointments (user_id, appointment_date, description, status_id) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("isss", $user_id, $appointment_date, $description, $status_id);

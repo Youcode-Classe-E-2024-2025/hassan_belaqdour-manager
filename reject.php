@@ -11,18 +11,18 @@ if (isset($_GET['id'])) {
 
     $conn = new mysqli("localhost", "root", "", "securite");
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        die("Erreur de connexion : " . $conn->connect_error);
     }
 
-    $query = "UPDATE users SET status_id = (SELECT id FROM status WHERE name = 'admin') WHERE id = ?";
-    $stmt = $conn->prepare($query);
+    $queryUpdateRole = "UPDATE users SET role = 'user' WHERE id = ?";
+    $stmt = $conn->prepare($queryUpdateRole);
     $stmt->bind_param("i", $userId);
-    
+
     if ($stmt->execute()) {
-        echo "User successfully promoted to Admin!";
+        echo "ce admin est maitenant un user";
         header("Refresh: 0; url=dashboard.php");
     } else {
-        echo "Error:probleme de update vers admin";
+        echo "Erreur : un probleme lors du update";
     }
 
     $stmt->close();

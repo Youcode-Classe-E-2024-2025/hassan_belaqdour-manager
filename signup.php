@@ -1,23 +1,19 @@
 <?php
 session_start();
 
-// Connexion à la base de données
-$host = 'localhost'; // Hôte
-$dbname = 'securite'; // Nom de la base de données
-$username = 'root'; // Nom d'utilisateur de la base de données
-$password = ''; // Mot de passe de la base de données (si vide, laisser vide pour XAMPP)
+$host = 'localhost';
+$dbname = 'securite';
+$username = 'root';
+$password = '';
 
 try {
-    // Créer une connexion à la base de données avec PDO
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    // En cas d'erreur de connexion, afficher un message
     die("Connection failed: " . $e->getMessage());
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupérer les valeurs du formulaire
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $phone_number = $_POST['phone_number'];
@@ -25,36 +21,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    // Vérifier si les mots de passe correspondent
     if ($password !== $confirm_password) {
         $error_message = "Les mots de passe ne correspondent pas.";
     } else {
-        // Hachage du mot de passe avant de l'enregistrer
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // Vérifier si l'email existe déjà dans la base de données
         $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
         $stmt->bindParam(':email', $email);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            $error_message = "Cet email est déjà utilisé.";
+            $error_message = "Cet email est deja enregistrer.";
         } else {
-            // Insérer l'utilisateur dans la table `users` (insertion de l'email et mot de passe)
             $stmt = $conn->prepare("INSERT INTO users (email, password, role) VALUES (:email, :password, :role)");
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':password', $hashed_password);
             $stmt->bindParam(':role', $role);
 
-            // Par défaut, le rôle est 'user'
             $role = 'user';
 
             if ($stmt->execute()) {
-                // Récupérer l'ID de l'utilisateur nouvellement inséré
                 $user_id = $conn->lastInsertId();
 
-                // Insérer les détails de l'utilisateur dans la table `user_details` (avec `user_id`)
                 $stmt = $conn->prepare("INSERT INTO user_details (user_id, first_name, last_name, phone_number) 
                                         VALUES (:user_id, :first_name, :last_name, :phone_number)");
                 $stmt->bindParam(':user_id', $user_id);
@@ -63,7 +52,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->bindParam(':phone_number', $phone_number);
 
                 if ($stmt->execute()) {
-                    // Rediriger vers la page de login après l'inscription réussie
                     header("Location: login.php");
                     exit();
                 } else {
