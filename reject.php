@@ -1,37 +1,27 @@
 <?php
-session_start();
-
 // Connexion à la base de données
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "securite";
-
-// Créer la connexion
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli("localhost", "root", "", "securite");
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Erreur de connexion : " . $conn->connect_error);
 }
 
-// Vérification si l'utilisateur est connecté et est admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
-    header("Location: login.php");
-    exit();
-}
-
-// Action de rejet
+// Vérifier si l'ID de l'utilisateur est passé dans l'URL
 if (isset($_GET['id'])) {
-    $userId = $_GET['id'];
-    $sql = "UPDATE users SET status = 'rejected' WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $userId);
+    $user_id = $_GET['id'];
+
+    // Mettre à jour le statut de l'utilisateur à "rejeté"
+    $query = "UPDATE users SET status_id = (SELECT id FROM status WHERE name = 'rejected') WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $user_id);
+
     if ($stmt->execute()) {
+        // Rediriger vers le tableau de bord après le rejet
         header("Location: dashboard.php");
         exit();
     } else {
         echo "Erreur lors du rejet de l'utilisateur.";
     }
 } else {
-    echo "Aucun utilisateur spécifié.";
+    echo "Aucun utilisateur trouvé.";
 }
 ?>

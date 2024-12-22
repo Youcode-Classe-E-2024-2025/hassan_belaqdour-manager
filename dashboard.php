@@ -5,9 +5,10 @@ if ($conn->connect_error) {
     die("Erreur de connexion : " . $conn->connect_error);
 }
 
-// Récupérer les utilisateurs en attente de validation
-$query = "SELECT users.id, users.email 
+// Récupérer les utilisateurs en attente de validation avec les informations supplémentaires de user_details
+$query = "SELECT users.id, users.email, user_details.first_name, user_details.last_name, user_details.phone_number
           FROM users 
+          JOIN user_details ON users.id = user_details.user_id
           JOIN status ON users.status_id = status.id
           WHERE status.name = 'pending'";
 $resultPendingUsers = $conn->query($query);
@@ -37,7 +38,10 @@ if (!$resultPendingUsers) {
                     <thead>
                         <tr>
                             <th class="border p-2">ID</th>
+                            <th class="border p-2">Prenom</th>
+                            <th class="border p-2">Nom</th>
                             <th class="border p-2">Email</th>
+                            <th class="border p-2">Numéro de téléphone</th>
                             <th class="border p-2">Actions</th>
                         </tr>
                     </thead>
@@ -45,7 +49,10 @@ if (!$resultPendingUsers) {
                         <?php while ($user = $resultPendingUsers->fetch_assoc()): ?>
                         <tr>
                             <td class="border p-2"><?php echo $user['id']; ?></td>
+                            <td class="border p-2"><?php echo $user['first_name']; ?></td>
+                            <td class="border p-2"><?php echo $user['last_name']; ?></td>
                             <td class="border p-2"><?php echo $user['email']; ?></td>
+                            <td class="border p-2"><?php echo $user['phone_number']; ?></td>
                             <td class="border p-2">
                                 <a href="accept.php?id=<?php echo $user['id']; ?>" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">Approuver</a>
                                 <a href="reject.php?id=<?php echo $user['id']; ?>" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Rejeter</a>

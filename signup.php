@@ -41,12 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user) {
             $error_message = "Cet email est déjà utilisé.";
         } else {
-            // Insérer l'utilisateur dans la base de données
-            $stmt = $conn->prepare("INSERT INTO users_details (first_name, last_name, phone_number) VALUES (:first_name, :last_name, :phone_number)");
-            $stmt->bindParam(':first_name', $first_name);
-            $stmt->bindParam(':last_name', $last_name);
-            $stmt->bindParam(':phone_number', $phone_number);
-             $stmt = $conn->prepare("INSERT INTO users (email, password, role) VALUES (:email, :password, :role)");
+            // Insérer l'utilisateur dans la table `users` (insertion de l'email et mot de passe)
+            $stmt = $conn->prepare("INSERT INTO users (email, password, role) VALUES (:email, :password, :role)");
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':password', $hashed_password);
             $stmt->bindParam(':role', $role);
@@ -55,9 +51,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $role = 'user';
 
             if ($stmt->execute()) {
-                // Rediriger vers la page de login après l'inscription réussie
-                header("Location: login.php");
-                exit();
+                // Récupérer l'ID de l'utilisateur nouvellement inséré
+                $user_id = $conn->lastInsertId();
+
+                // Insérer les détails de l'utilisateur dans la table `user_details` (avec `user_id`)
+                $stmt = $conn->prepare("INSERT INTO user_details (user_id, first_name, last_name, phone_number) 
+                                        VALUES (:user_id, :first_name, :last_name, :phone_number)");
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->bindParam(':first_name', $first_name);
+                $stmt->bindParam(':last_name', $last_name);
+                $stmt->bindParam(':phone_number', $phone_number);
+
+                if ($stmt->execute()) {
+                    // Rediriger vers la page de login après l'inscription réussie
+                    header("Location: login.php");
+                    exit();
+                } else {
+                    $error_message = "Une erreur est survenue lors de l'inscription des détails de l'utilisateur.";
+                }
             } else {
                 $error_message = "Une erreur est survenue lors de l'inscription.";
             }
